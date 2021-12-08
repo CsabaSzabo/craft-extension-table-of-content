@@ -1,0 +1,10 @@
+{
+  "id": "dev.csabaszabo.craftextension.tableofcontent",
+  "name": "Table of Content",
+  "fileName": "craft-table-of-content-csabaszabo",
+  "author" : "Csaba Szabo",
+  "author-email" : "csaba@evdb.io",
+  "description" : "Creating Table of Content of a document",
+  "api": "1.0.0",
+  "main": "index.html"
+}
