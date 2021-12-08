@@ -2,6 +2,10 @@
 
 This extension is capable of generating a Table of content for a document (including it's sub documents).
 
+## Demo video
+https://user-images.githubusercontent.com/3639032/145247767-0b482289-3561-4761-97b7-d6ccb227f2e3.mov
+
+
 ## Building
 
 Simply run `npm install` and than `npm run build` to generate the .craftX file which can be installed.
