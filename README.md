@@ -14,8 +14,8 @@ You can use `npm run dev` to test and debug in your local environment
 To learn more about Craft eXtensions visit the [Craft X developer portal](https://developer.craft.do).
 
 ## TODOs
-
-- Add Table of Contents to the top of the document
 - Refresh button to update TOC after changes
 - Refresh the already appended TOC
 - Adding internal deeplinks
+- Public analytics integration
+
