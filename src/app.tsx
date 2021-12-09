@@ -33,6 +33,7 @@ const App: React.FC<{}> = () => {
     includeHeadings: true,
   });
   const [tableOfContentsItems, settableOfContentsItems] = React.useState<CraftTextBlock[]>([]);
+  const [currentPageId, setCurrentPageId] = React.useState<string | null>(null);
 
   function onToggleIncludeSubblocks(event: React.ChangeEvent<HTMLInputElement>) {
     setTocSettings({
@@ -65,8 +66,10 @@ const App: React.FC<{}> = () => {
   React.useEffect(() => {
     setLoading(true);
     loadDocumentItems(tocSettings)
-      .then(tableOfContentsItems => {
-        settableOfContentsItems(tableOfContentsItems);
+      .then(tableOfContentsRootBlock => {
+        const textSubBlocks = tableOfContentsRootBlock.subblocks as CraftTextBlock[];
+        settableOfContentsItems(textSubBlocks);
+        setCurrentPageId(tableOfContentsRootBlock.id);
       })
       .catch(err => {
         setDocumentError(err);
@@ -105,7 +108,13 @@ const App: React.FC<{}> = () => {
     const tocContent = getInsertedTOCTextBlocks(tableOfContentsItems, 0);
   
     // Insert
-    craft.dataApi.addBlocks([tocHeader, ...tocContent]);
+    const blocksToInsert = [tocHeader, ...tocContent];
+    if (currentPageId) {
+      const topLocation = craft.location.indexLocation(currentPageId, 0);
+      craft.dataApi.addBlocks(blocksToInsert, topLocation);
+    } else {
+      craft.dataApi.addBlocks(blocksToInsert);
+    }
   }
 
   function getInsertedTOCTextBlocks(tocItems: CraftTextBlock[], indent: number): CraftTextBlockInsert[] {
@@ -204,14 +213,6 @@ function useCraftDarkMode() {
   }, []);
 
   return isDarkMode;
-}
-
-function insertHelloWorld() {
-  const block = craft.blockFactory.textBlock({
-    content: "Hello world!"
-  });
-
-  craft.dataApi.addBlocks([block]);
 }
 
 async function loadDocumentItems(tocSettings: TOCSettings) {

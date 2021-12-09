@@ -2,10 +2,10 @@ import { CraftBlock, CraftTextBlock, CraftTextBlockStyle } from "@craftdocs/craf
 import { blockWithSomeSubblockLevels } from "./mock/blocks";
 import { TOCSettings } from "./types"
 
-export async function getAllTextTitleBlocks(tocSettings: TOCSettings): Promise<CraftTextBlock[]> {
+export async function getAllTextTitleBlocks(tocSettings: TOCSettings): Promise<CraftTextBlock> {
   const currentDocument = await getCurrentPage();
   const filteredCurrentDocument = filterTextBlockForTableOfContent(currentDocument, tocSettings)
-  return filteredCurrentDocument.subblocks as CraftTextBlock[];
+  return filteredCurrentDocument;
 }
 
 function filterTextBlockForTableOfContent(block: CraftTextBlock, tocSettings: TOCSettings): CraftTextBlock {
