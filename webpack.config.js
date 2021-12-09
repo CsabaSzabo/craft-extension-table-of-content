@@ -5,6 +5,10 @@ const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin')
 const ZipPlugin = require('zip-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
 const { CraftExtensionApiPlugin } = require('@craftdocs/craft-extension-api-sdk')
+const webpack = require('webpack');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 module.exports = (env, argv) => {
   const isProd = argv.mode === 'production'
@@ -49,6 +53,10 @@ module.exports = (env, argv) => {
     },
     plugins: [
       new CraftExtensionApiPlugin(),
+      new webpack.DefinePlugin({
+        'IS_DEV_MODE': !isProd,
+        'INSIGHTS_PROJECT_KEY': JSON.stringify(process.env.INSIGHTS_PROJECT_KEY || null),
+      }),
       new HtmlWebpackPlugin({
         inject: 'body',
         template: path.resolve(__dirname, 'src/index.html'),

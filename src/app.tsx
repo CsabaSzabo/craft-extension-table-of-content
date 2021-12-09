@@ -6,10 +6,13 @@ import {
   CraftTextBlockInsert,
   TextStyle,
   ListStyle,
-  NoneListStyle,
-  ToggleListStyle,
 } from '@craftdocs/craft-extension-api';
 import { getAllTextTitleBlocks } from "./craftdata";
+import { init, track, trackPages, parameters } from "insights-js";
+
+// Constants
+declare const INSIGHTS_PROJECT_KEY: string | null; // from webpack
+declare const IS_DEV_MODE: boolean; // from webpack
 
 // Types
 import { TOCSettings } from "./types"
@@ -115,6 +118,21 @@ const App: React.FC<{}> = () => {
     } else {
       craft.dataApi.addBlocks(blocksToInsert);
     }
+
+    if (!IS_DEV_MODE) {
+      track({
+        id: "toc-inserted",
+        parameters: {
+          rootTocItemCount: tableOfContentsItems.length.toString(),
+          tocItemCount: getTOCItemCount(tableOfContentsItems).toString(),
+          tocDeepness: getTOCDeepness(tableOfContentsItems).toString(),
+          settingsIncludeSubblocks: tocSettings.includeSubblocks.toString(),
+          settingsAddDeeplinks: tocSettings.addDeeplinks.toString(),
+          settingsIncludeSubtitles: tocSettings.includeSubtitles.toString(),
+          settingsIncludeHeadings: tocSettings.includeHeadings.toString(),
+        }
+      })
+    }
   }
 
   function getInsertedTOCTextBlocks(tocItems: CraftTextBlock[], indent: number): CraftTextBlockInsert[] {
@@ -215,10 +233,38 @@ function useCraftDarkMode() {
   return isDarkMode;
 }
 
+function getTOCItemCount(items: CraftTextBlock[]): number {
+  let count = 0;
+  items.forEach(item => {
+    count++;
+    if (item.subblocks.length > 0) {
+      count += getTOCItemCount(item.subblocks as CraftTextBlock[]);
+    }
+  });
+  return count;
+}
+
+function getTOCDeepness(items: CraftTextBlock[]): number {
+  let maxDeepness = 0;
+  items.forEach(item => {
+    if (item.subblocks.length > 0) {
+      const deepness = getTOCDeepness(item.subblocks as CraftTextBlock[]);
+      if (deepness > maxDeepness) {
+        maxDeepness = deepness;
+      }
+    }
+  });
+  return maxDeepness + 1;
+}
+
 async function loadDocumentItems(tocSettings: TOCSettings) {
-  return await getAllTextTitleBlocks(tocSettings);
+  return await getAllTextTitleBlocks(tocSettings, IS_DEV_MODE);
 }
 
 export function initApp() {
+  if (!IS_DEV_MODE && INSIGHTS_PROJECT_KEY) {
+    init(INSIGHTS_PROJECT_KEY);
+    trackPages();
+  }
   ReactDOM.render(<App />, document.getElementById('react-root'))
 }

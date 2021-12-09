@@ -2,8 +2,8 @@ import { CraftBlock, CraftTextBlock, CraftTextBlockStyle } from "@craftdocs/craf
 import { blockWithSomeSubblockLevels } from "./mock/blocks";
 import { TOCSettings } from "./types"
 
-export async function getAllTextTitleBlocks(tocSettings: TOCSettings): Promise<CraftTextBlock> {
-  const currentDocument = await getCurrentPage();
+export async function getAllTextTitleBlocks(tocSettings: TOCSettings, isDevMode: boolean): Promise<CraftTextBlock> {
+  const currentDocument = await getCurrentPage(isDevMode);
   const filteredCurrentDocument = filterTextBlockForTableOfContent(currentDocument, tocSettings)
   return filteredCurrentDocument;
 }
@@ -54,23 +54,17 @@ function isTitleTextBlock(block: CraftTextBlock, tocSettings: TOCSettings): bool
   return requiredFields.includes(block.style.textStyle);
 }
 
-async function getCurrentPage(): Promise<CraftTextBlock> {
-
-  // @ts-ignore
-  if (typeof craftDev !== 'undefined') {
+async function getCurrentPage(isDevMode: boolean): Promise<CraftTextBlock> {
+  if (isDevMode) {
     // DEV mode
-    console.warn('=== DEV MODE | mock data ===');
     let mockCurrentDocument = blockWithSomeSubblockLevels;
     return mockCurrentDocument;
-
   } else {
     // PROD mode
     let result = await craft.dataApi.getCurrentPage();
-  
     if (result.status !== "success") {
       throw new Error(result.error);
     }
-
     return result.data;
   }
 }
