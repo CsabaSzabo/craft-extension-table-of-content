@@ -15,8 +15,8 @@ import { getAllTextTitleBlocks } from "./craftdata";
 import { TOCSettings } from "./types"
 
 // Components
-import { TableOfContentSettings } from "./TableOfContentSettings";
-import { TableOfContentPreview } from "./TableOfContentPreview";
+import { TableOfContentsSettings } from "./TableOfContentsSettings";
+import { TableOfContentsPreview } from "./TableOfContentsPreview";
 
 const App: React.FC<{}> = () => {
   const isDarkMode = useCraftDarkMode();
@@ -32,7 +32,7 @@ const App: React.FC<{}> = () => {
     includeSubtitles: true,
     includeHeadings: true,
   });
-  const [tableOfContentItems, setTableOfContentItems] = React.useState<CraftTextBlock[]>([]);
+  const [tableOfContentsItems, settableOfContentsItems] = React.useState<CraftTextBlock[]>([]);
 
   function onToggleIncludeSubblocks(event: React.ChangeEvent<HTMLInputElement>) {
     setTocSettings({
@@ -65,8 +65,8 @@ const App: React.FC<{}> = () => {
   React.useEffect(() => {
     setLoading(true);
     loadDocumentItems(tocSettings)
-      .then(tableOfContentItems => {
-        setTableOfContentItems(tableOfContentItems);
+      .then(tableOfContentsItems => {
+        settableOfContentsItems(tableOfContentsItems);
       })
       .catch(err => {
         setDocumentError(err);
@@ -85,12 +85,12 @@ const App: React.FC<{}> = () => {
     }
   }, [isDarkMode]);
 
-  const tocEmpty = (<p className="toc-empty">This document doesn't contain any title, subtitle or heading, so table of content could not be generated.</p>)
+  const tocEmpty = (<p className="toc-empty">This document doesn't contain any title, subtitle or heading, so Table of Contents could not be generated.</p>)
 
-  function insertTableOfContent() {
+  function insertTableOfContents() {
 
     const content: CraftTextRun[] = [
-      { text: "Table of Content" }
+      { text: "Table of Contents" }
     ];
   
     const tocHeader = craft.blockFactory.textBlock({
@@ -102,7 +102,7 @@ const App: React.FC<{}> = () => {
       color: "grey2",
     })
 
-    const tocContent = getInsertedTOCTextBlocks(tableOfContentItems, 0);
+    const tocContent = getInsertedTOCTextBlocks(tableOfContentsItems, 0);
   
     // Insert
     craft.dataApi.addBlocks([tocHeader, ...tocContent]);
@@ -146,7 +146,7 @@ const App: React.FC<{}> = () => {
     <div id="app">
       <header className={isDarkMode ? 'header-dark' : 'header-light'}>
         <div></div>
-        <div className="title">Table of content</div>
+        <div className="title">Table of Contents</div>
         <div></div>
       </header>
       <main>
@@ -159,7 +159,7 @@ const App: React.FC<{}> = () => {
           (<p className={`error-message ${isDarkMode ? 'dark' : 'light'}`}>Error happened in document download. Please try again</p>) :
           (
             <>
-              <TableOfContentSettings
+              <TableOfContentsSettings
                 isDarkMode={isDarkMode}
                 tocSettings={tocSettings}
                 onToggleIncludeSubblocks={onToggleIncludeSubblocks}
@@ -169,18 +169,18 @@ const App: React.FC<{}> = () => {
               />
 
               {
-                tableOfContentItems.length === 0 ?
+                tableOfContentsItems.length === 0 ?
                   tocEmpty :
-                  <TableOfContentPreview
+                  <TableOfContentsPreview
                     isDarkMode={isDarkMode}
-                    tableOfContent={tableOfContentItems}
+                    tableOfContents={tableOfContentsItems}
                     indent={0}
                   />
               }
 
-              { tableOfContentItems.length > 0 &&
-                <button className={`btn toc-btn ${isDarkMode ? "dark" : ""}`} onClick={insertTableOfContent}>
-                  Add Table of Content
+              { tableOfContentsItems.length > 0 &&
+                <button className={`btn toc-btn ${isDarkMode ? "dark" : ""}`} onClick={insertTableOfContents}>
+                  Add Table of Contents
                 </button>
               }
             </>

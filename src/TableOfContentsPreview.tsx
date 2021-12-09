@@ -1,21 +1,21 @@
 import * as React from "react";
 import { CraftTextBlock } from '@craftdocs/craft-extension-api';
 
-type TableOfContentPreviewProps = {
+type TableOfContentsPreviewProps = {
   isDarkMode: boolean;
-  tableOfContent: CraftTextBlock[];
+  tableOfContents: CraftTextBlock[];
   indent: number;
 };
 
 // Components
-export const TableOfContentPreview: React.FC<TableOfContentPreviewProps> = (props) => {
+export const TableOfContentsPreview: React.FC<TableOfContentsPreviewProps> = (props) => {
   
-  const { isDarkMode, tableOfContent, indent } = props;
+  const { isDarkMode, tableOfContents, indent } = props;
 
   const tocPreview: JSX.Element[] = [];
 
-  if (tableOfContent.length > 0) {
-    tableOfContent.forEach((item, index) => {
+  if (tableOfContents.length > 0) {
+    tableOfContents.forEach((item, index) => {
       const hasSubs = item.subblocks.length > 0;
       let divClass = 'toc-item';
 
@@ -37,9 +37,9 @@ export const TableOfContentPreview: React.FC<TableOfContentPreviewProps> = (prop
       tocPreview.push(<div className={divClass} key={item.id}>{item.content.map(textRun => textRun.text).join("") }</div>);
 
       if (hasSubs) {
-        const subToc = <TableOfContentPreview
+        const subToc = <TableOfContentsPreview
           key={`${item.id}-toc-preview`}
-          tableOfContent={item.subblocks as CraftTextBlock[]}
+          tableOfContents={item.subblocks as CraftTextBlock[]}
           indent={indent + 1}
           isDarkMode={isDarkMode}
         />;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TOCSettings } from './types';
 
-type TableOfContentSettingsProps = {
+type TableOfContentsSettingsProps = {
   isDarkMode: boolean,
   tocSettings: TOCSettings,
   onToggleIncludeSubblocks: (event: React.ChangeEvent<HTMLInputElement>) => void,
@@ -10,7 +10,7 @@ type TableOfContentSettingsProps = {
   onToggleIncludeHeadings: (event: React.ChangeEvent<HTMLInputElement>) => void,
 }
 
-export const TableOfContentSettings: React.FC<TableOfContentSettingsProps> = (props) => {
+export const TableOfContentsSettings: React.FC<TableOfContentsSettingsProps> = (props) => {
   const { isDarkMode, tocSettings, onToggleIncludeSubblocks, onToggleAddDeeplinks, onToggleIncludeSubtitles, onToggleIncludeHeadings } = props;
   
   return (

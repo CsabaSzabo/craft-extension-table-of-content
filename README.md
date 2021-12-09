@@ -1,6 +1,6 @@
-# Craft eXtension - Table of content
+# Craft eXtension - Table of Contents
 
-This extension is capable of generating a Table of content for a document (including it's sub documents).
+This extension is capable of generating a Table of Contents for a document (including it's sub documents).
 
 ## Demo video
 https://user-images.githubusercontent.com/3639032/145247767-0b482289-3561-4761-97b7-d6ccb227f2e3.mov
@@ -15,7 +15,7 @@ To learn more about Craft eXtensions visit the [Craft X developer portal](https:
 
 ## TODOs
 
-- Add Table of content to the top of the document
+- Add Table of Contents to the top of the document
 - Refresh button to update TOC after changes
 - Refresh the already appended TOC
 - Adding internal deeplinks
