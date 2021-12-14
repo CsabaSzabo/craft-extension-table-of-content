@@ -31,11 +31,11 @@ const App: React.FC<{}> = () => {
   // TOC content
   const [tocSettings, setTocSettings] = React.useState<TOCSettings>({
     includeSubblocks: true,
-    addDeeplinks: false,
+    addDeeplinks: true,
     includeSubtitles: true,
     includeHeadings: true,
   });
-  const [tableOfContentsItems, settableOfContentsItems] = React.useState<CraftTextBlock[]>([]);
+  const [tableOfContentsItems, setTableOfContentsItems] = React.useState<CraftTextBlock[]>([]);
   const [currentPageId, setCurrentPageId] = React.useState<string | null>(null);
 
   function onToggleIncludeSubblocks(event: React.ChangeEvent<HTMLInputElement>) {
@@ -66,12 +66,12 @@ const App: React.FC<{}> = () => {
     });
   }
 
-  React.useEffect(() => {
+  function reloadTOC() {
     setLoading(true);
     loadDocumentItems(tocSettings)
       .then(tableOfContentsRootBlock => {
         const textSubBlocks = tableOfContentsRootBlock.subblocks as CraftTextBlock[];
-        settableOfContentsItems(textSubBlocks);
+        setTableOfContentsItems(textSubBlocks);
         setCurrentPageId(tableOfContentsRootBlock.id);
       })
       .catch(err => {
@@ -81,6 +81,10 @@ const App: React.FC<{}> = () => {
       .finally(() => {
         setLoading(false);
       });
+  }
+
+  React.useEffect(() => {
+    reloadTOC();
   }, [tocSettings]);
 
   React.useEffect(() => {
@@ -140,7 +144,22 @@ const App: React.FC<{}> = () => {
     const insertedTextBlocks: CraftTextBlockInsert[] = [];
 
     tocItems.forEach(tocItem => {
-      let content = tocItem.content.map(contentItem => contentItem.text).join(" ");
+      let contentText = tocItem.content.map(contentItem => contentItem.text).join(" ");
+      let content: CraftTextRun[] | string;
+      
+      if (!tocSettings.addDeeplinks || tocItem.spaceId == null) {
+        content = contentText
+      } else {
+        content = [{
+          text: contentText,
+          link: {
+            type: "blockLink",
+            spaceId: tocItem.spaceId || "",
+            blockId: tocItem.id,
+          }
+        }]
+      }
+
       let textStyle: TextStyle = tocItem.style.textStyle === 'title' ? 'heading' : tocItem.style.textStyle === 'subtitle' ? 'strong' : tocItem.style.textStyle === 'heading' ? 'body' : 'caption';
       
       let listStyle: ListStyle = {
@@ -202,6 +221,7 @@ const App: React.FC<{}> = () => {
                     isDarkMode={isDarkMode}
                     tableOfContents={tableOfContentsItems}
                     indent={0}
+                    refreshTableOfContents={reloadTOC}
                   />
               }
 

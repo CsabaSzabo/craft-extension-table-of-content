@@ -5,12 +5,13 @@ type TableOfContentsPreviewProps = {
   isDarkMode: boolean;
   tableOfContents: CraftTextBlock[];
   indent: number;
+  refreshTableOfContents: () => void;
 };
 
 // Components
 export const TableOfContentsPreview: React.FC<TableOfContentsPreviewProps> = (props) => {
   
-  const { isDarkMode, tableOfContents, indent } = props;
+  const { isDarkMode, tableOfContents, indent, refreshTableOfContents } = props;
 
   const tocPreview: JSX.Element[] = [];
 
@@ -42,6 +43,7 @@ export const TableOfContentsPreview: React.FC<TableOfContentsPreviewProps> = (pr
           tableOfContents={item.subblocks as CraftTextBlock[]}
           indent={indent + 1}
           isDarkMode={isDarkMode}
+          refreshTableOfContents={refreshTableOfContents}
         />;
         tocPreview.push(subToc);
       }
@@ -50,7 +52,15 @@ export const TableOfContentsPreview: React.FC<TableOfContentsPreviewProps> = (pr
 
   return <div className="toc-preview">
     <>
-      { indent === 0 && <p className={`title ${isDarkMode ? 'dark' : 'light'}`}>Preview</p> }
+      {
+        indent === 0 &&
+        <div className="toc-preview-header">
+          <p className={`title ${isDarkMode ? 'dark' : 'light'}`}>Preview</p>
+          <button className={`btn toc-preview-btn ${isDarkMode ? "dark" : ""}`} onClick={refreshTableOfContents}>
+            Refresh
+          </button>
+        </div>
+      }
       { 
         <div
           className={`toc-container toc-container-indent-${indent} ${isDarkMode ? 'toc-container-dark' : 'toc-container-light'}`}
