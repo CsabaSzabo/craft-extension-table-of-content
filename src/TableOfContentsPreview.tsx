@@ -7,19 +7,25 @@ type TableOfContentsPreviewProps = {
   tableOfContents: CraftTextBlock[];
   indent: number;
   refreshTableOfContents: () => void;
+  tocItemNavigationStarted:() => void;
+  tocItemNavigationFailed:() => void;
 };
 
 // Components
 export const TableOfContentsPreview: React.FC<TableOfContentsPreviewProps> = (props) => {
   
-  const { craftEnv, tableOfContents, indent, refreshTableOfContents } = props;
+  const { craftEnv, tableOfContents, indent, refreshTableOfContents, tocItemNavigationStarted, tocItemNavigationFailed } = props;
   const tocPreview: JSX.Element[] = [];
 
   async function handleClick(item: CraftTextBlock) {
+    
+    // Temporary disable TOC navigation analytics, as the request cannot go out, and InsightsJS API doesn't provide a return value
+    // tocItemNavigationStarted();
     const navigationResult = await craft.editorApi.navigateToBlockId(item.id);
     if (navigationResult.status !== "success") {
       console.error(`Failed to navigate to block ${item.id}`);
       // TODO: handle failed navigation
+      tocItemNavigationFailed();
     }
   }
 
@@ -56,6 +62,8 @@ export const TableOfContentsPreview: React.FC<TableOfContentsPreviewProps> = (pr
           indent={indent + 1}
           craftEnv={craftEnv}
           refreshTableOfContents={refreshTableOfContents}
+          tocItemNavigationStarted={tocItemNavigationStarted}
+          tocItemNavigationFailed={tocItemNavigationFailed}
         />;
         tocPreview.push(subToc);
       }

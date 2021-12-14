@@ -127,17 +127,7 @@ const App: React.FC<{}> = () => {
     if (!IS_DEV_MODE) {
       track({
         id: "toc-inserted",
-        parameters: {
-          isDarkMode: craftEnv.isDarkMode ? 'dark' : 'light',
-          platform: craftEnv.platform,
-          rootTocItemCount: tableOfContentsItems.length.toString(),
-          tocItemCount: getTOCItemCount(tableOfContentsItems).toString(),
-          tocDeepness: getTOCDeepness(tableOfContentsItems).toString(),
-          settingsIncludeSubblocks: tocSettings.includeSubblocks.toString(),
-          settingsAddDeeplinks: tocSettings.addDeeplinks.toString(),
-          settingsIncludeSubtitles: tocSettings.includeSubtitles.toString(),
-          settingsIncludeHeadings: tocSettings.includeHeadings.toString(),
-        }
+        parameters: getAnalyticsParamters()
       })
     }
   }
@@ -191,6 +181,38 @@ const App: React.FC<{}> = () => {
     return insertedTextBlocks;
   }
 
+  function logTocItemNavigationStarted() {
+    if (!IS_DEV_MODE) {
+      track({
+        id: "toc-navigation-started",
+        parameters: getAnalyticsParamters()
+      })
+    }
+  }
+
+  function logTocItemNavigationFailed() {
+    if (!IS_DEV_MODE) {
+      track({
+        id: "toc-navigation-failed",
+        parameters: getAnalyticsParamters()
+      })
+    }
+  }
+
+  function getAnalyticsParamters() {
+    return {
+      isDarkMode: craftEnv.isDarkMode ? 'dark' : 'light',
+      platform: craftEnv.platform,
+      rootTocItemCount: tableOfContentsItems.length.toString(),
+      tocItemCount: getTOCItemCount(tableOfContentsItems).toString(),
+      tocDeepness: getTOCDeepness(tableOfContentsItems).toString(),
+      settingsIncludeSubblocks: tocSettings.includeSubblocks.toString(),
+      settingsAddDeeplinks: tocSettings.addDeeplinks.toString(),
+      settingsIncludeSubtitles: tocSettings.includeSubtitles.toString(),
+      settingsIncludeHeadings: tocSettings.includeHeadings.toString(),
+    }
+  }
+
   return (
     <div id="app">
       <header className={craftEnv.isDarkMode ? 'header-dark' : 'header-light'}>
@@ -225,6 +247,8 @@ const App: React.FC<{}> = () => {
                     tableOfContents={tableOfContentsItems}
                     indent={0}
                     refreshTableOfContents={reloadTOC}
+                    tocItemNavigationStarted={logTocItemNavigationStarted}
+                    tocItemNavigationFailed={logTocItemNavigationFailed}
                   />
               }
 
