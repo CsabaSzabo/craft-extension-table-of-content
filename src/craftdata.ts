@@ -15,11 +15,18 @@ function filterTextBlockForTableOfContent(block: CraftTextBlock, tocSettings: TO
 
   const textSubBlocks = block.subblocks.filter(isTextBlock);
   textSubBlocks.forEach(textSubBlock => {
-    if (tocSettings.includeSubblocks && doesTextBlockContainTitleSubblock(textSubBlock, tocSettings)) {
+    const containTitleSubblock = doesTextBlockContainTitleSubblock(textSubBlock, tocSettings)
+    if (tocSettings.showSubpages && tocSettings.showOnlyStyledSubpages && containTitleSubblock) {
+      // Add only styled textblock to TOC
+      console.log(`A - showSubpages=${tocSettings.showSubpages} - showOnlyStyledSubpages=${tocSettings.showOnlyStyledSubpages} - containTitleSubblock=${containTitleSubblock}`)
       filteredTextBlock.subblocks.push(filterTextBlockForTableOfContent(textSubBlock, tocSettings));
+    } else if (tocSettings.showSubpages) {
+      // Add any textblock to TOC
+      console.log(`B - showSubpages=${tocSettings.showSubpages} - showOnlyStyledSubpages=${tocSettings.showOnlyStyledSubpages} - containTitleSubblock=${containTitleSubblock}`)
+      filteredTextBlock.subblocks.push(textSubBlock);
     } else if (isTitleTextBlock(textSubBlock, tocSettings)) {
       // Othersiwe add only title textblock
-      if (tocSettings.includeSubblocks) {
+      if (tocSettings.showSubpages) {
         filteredTextBlock.subblocks.push(textSubBlock);
       } else {
         const filteredTextSublockWithoutSubsubblocks = JSON.parse(JSON.stringify(textSubBlock));

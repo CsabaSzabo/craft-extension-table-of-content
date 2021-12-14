@@ -2,10 +2,16 @@ body {
   background-color: white;
   font-family: 'Roboto', sans-serif;
   margin: 0px;
+
+  --color-lightgrey: #f3f3f3;
+  --color-almostblack: #222222;
+
+  --color-black01: rgba(255, 255, 255, 0.1);
+  --color-white01: rgba(0, 0, 0, 0.1);
 }
 
 body.dark {
-  background-color: #222222;
+  background-color: var(--color-almostblack);
   color: white;
 }
 
@@ -25,12 +31,12 @@ header {
 
 .header-dark {
   border-bottom: 0.5px solid rgba(255, 255, 255, 0.4);
-  background-color: #222222;
+  background-color: var(--color-almostblack);
 }
 
 .header-light {
   border-bottom: 0.5px solid rgba(0, 0, 0, 0.2);
-  background-color: #f3f3f3;
+  background-color: var(--color-lightgrey);
 }
 
 header .title {
@@ -58,7 +64,22 @@ main {
   margin: 2px 0px;
 }
 
-.toc-settings .settings .settingsItem label {
+.toc-settings .settings .settingsItem.hasSubItems {
+  background-color: var(--color-white01);
+  border-radius: 4px;
+}
+
+.toc-settings .settings .settingsItem.hasSubItems.dark {
+  background-color: var(--color-black01);
+}
+
+.toc-settings .settings .settingsSubItem {
+  font-size: 11px;
+  width: 100%;
+  margin-left: 4px;
+}
+
+.toc-settings .settings .settingsItem label, .toc-settings .settings .settingsSubItem label {
   display: flex;
   align-items: center;
   width: 100%;
@@ -230,12 +251,12 @@ footer {
 
 .footer-dark {
   border-top: 0.5px solid rgba(255, 255, 255, 0.4);
-  background-color: #222222;
+  background-color: var(--color-almostblack);
 }
 
 .footer-light {
   border-top: 0.5px solid rgba(0, 0, 0, 0.2);
-  background-color: #f3f3f3;
+  background-color: var(--color-lightgrey);
 }
 
 .authorlink-dark {

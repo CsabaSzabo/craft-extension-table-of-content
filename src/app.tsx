@@ -30,7 +30,8 @@ const App: React.FC<{}> = () => {
 
   // TOC content
   const [tocSettings, setTocSettings] = React.useState<TOCSettings>({
-    includeSubblocks: true,
+    showSubpages: true,
+    showOnlyStyledSubpages: false,
     addDeeplinks: true,
     includeSubtitles: true,
     includeHeadings: true,
@@ -38,32 +39,12 @@ const App: React.FC<{}> = () => {
   const [tableOfContentsItems, setTableOfContentsItems] = React.useState<CraftTextBlock[]>([]);
   const [currentPageId, setCurrentPageId] = React.useState<string | null>(null);
 
-  function onToggleIncludeSubblocks(event: React.ChangeEvent<HTMLInputElement>) {
-    setTocSettings({
+  function onToggleSettingsCheckbox(event: React.ChangeEvent<HTMLInputElement>, setting: keyof TOCSettings) {
+    const newSettings = {
       ...tocSettings,
-      includeSubblocks: event.target.checked
-    });
-  }
-
-  function onToggleAddDeeplinks(event: React.ChangeEvent<HTMLInputElement>) {
-    setTocSettings({
-      ...tocSettings,
-      addDeeplinks: event.target.checked
-    });
-  }
-
-  function onToggleIncludeSubtitles(event: React.ChangeEvent<HTMLInputElement>) {
-    setTocSettings({
-      ...tocSettings,
-      includeSubtitles: event.target.checked
-    });
-  }
-
-  function onToggleIncludeHeadings(event: React.ChangeEvent<HTMLInputElement>) {
-    setTocSettings({
-      ...tocSettings,
-      includeHeadings: event.target.checked
-    });
+      [setting]: event.target.checked,
+    };
+    setTocSettings(newSettings);
   }
 
   function reloadTOC() {
@@ -130,7 +111,8 @@ const App: React.FC<{}> = () => {
           rootTocItemCount: tableOfContentsItems.length.toString(),
           tocItemCount: getTOCItemCount(tableOfContentsItems).toString(),
           tocDeepness: getTOCDeepness(tableOfContentsItems).toString(),
-          settingsIncludeSubblocks: tocSettings.includeSubblocks.toString(),
+          settingsShowSubpages: tocSettings.showSubpages.toString(),
+          settingsShowOnlyStyledSubpages: tocSettings.showOnlyStyledSubpages.toString(),
           settingsAddDeeplinks: tocSettings.addDeeplinks.toString(),
           settingsIncludeSubtitles: tocSettings.includeSubtitles.toString(),
           settingsIncludeHeadings: tocSettings.includeHeadings.toString(),
@@ -208,10 +190,7 @@ const App: React.FC<{}> = () => {
               <TableOfContentsSettings
                 isDarkMode={isDarkMode}
                 tocSettings={tocSettings}
-                onToggleIncludeSubblocks={onToggleIncludeSubblocks}
-                onToggleAddDeeplinks={onToggleAddDeeplinks}
-                onToggleIncludeSubtitles={onToggleIncludeSubtitles}
-                onToggleIncludeHeadings={onToggleIncludeHeadings}
+                onToggleSettingsCheckbox={onToggleSettingsCheckbox}
               />
 
               {
