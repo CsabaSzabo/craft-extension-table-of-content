@@ -24,7 +24,6 @@ export const TableOfContentsSettings: React.FC<TableOfContentsSettingsProps> = (
               type="checkbox"
               checked={tocSettings.addDeeplinks}
               onChange={onToggleAddDeeplinks}
-              disabled
             />
             <span>Add deeplinks</span>
           </label>

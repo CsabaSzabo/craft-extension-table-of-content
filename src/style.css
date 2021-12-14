@@ -78,6 +78,21 @@ main {
   color: rgb(143, 143, 143);
 }
 
+.toc-preview-header {
+  display: flex;
+}
+
+.toc-preview-header .title {
+  width: auto;
+}
+
+.toc-preview-header .toc-preview-btn {
+  font-size: 11px;
+  padding: 2px 4px;
+  height: 18px;
+  margin: auto 4px;
+}
+
 .btn {
   background-color: rgb(0, 128, 128);
   border: none;
