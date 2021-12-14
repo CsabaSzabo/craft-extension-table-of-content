@@ -1,8 +1,9 @@
 import * as React from "react";
 import { CraftTextBlock } from '@craftdocs/craft-extension-api';
+import { CraftEnv } from "./types"
 
 type TableOfContentsPreviewProps = {
-  isDarkMode: boolean;
+  craftEnv: CraftEnv;
   tableOfContents: CraftTextBlock[];
   indent: number;
   refreshTableOfContents: () => void;
@@ -11,9 +12,16 @@ type TableOfContentsPreviewProps = {
 // Components
 export const TableOfContentsPreview: React.FC<TableOfContentsPreviewProps> = (props) => {
   
-  const { isDarkMode, tableOfContents, indent, refreshTableOfContents } = props;
-
+  const { craftEnv, tableOfContents, indent, refreshTableOfContents } = props;
   const tocPreview: JSX.Element[] = [];
+
+  async function handleClick(item: CraftTextBlock) {
+    const navigationResult = await craft.editorApi.navigateToBlockId(item.id);
+    if (navigationResult.status !== "success") {
+      console.error(`Failed to navigate to block ${item.id}`);
+      // TODO: handle failed navigation
+    }
+  }
 
   if (tableOfContents.length > 0) {
     tableOfContents.forEach((item, index) => {
@@ -35,14 +43,18 @@ export const TableOfContentsPreview: React.FC<TableOfContentsPreviewProps> = (pr
       } else if (hasSubs) {
         divClass += ' toc-text toc-subs';
       }
-      tocPreview.push(<div className={divClass} key={item.id}>{item.content.map(textRun => textRun.text).join("") }</div>);
+      tocPreview.push(
+        <div className={divClass} key={item.id} onClick={(e) => handleClick(item)}>
+          {item.content.map(textRun => textRun.text).join("") }
+        </div>
+      );
 
       if (hasSubs) {
         const subToc = <TableOfContentsPreview
           key={`${item.id}-toc-preview`}
           tableOfContents={item.subblocks as CraftTextBlock[]}
           indent={indent + 1}
-          isDarkMode={isDarkMode}
+          craftEnv={craftEnv}
           refreshTableOfContents={refreshTableOfContents}
         />;
         tocPreview.push(subToc);
@@ -55,15 +67,15 @@ export const TableOfContentsPreview: React.FC<TableOfContentsPreviewProps> = (pr
       {
         indent === 0 &&
         <div className="toc-preview-header">
-          <p className={`title ${isDarkMode ? 'dark' : 'light'}`}>Preview</p>
-          <button className={`btn toc-preview-btn ${isDarkMode ? "dark" : ""}`} onClick={refreshTableOfContents}>
+          <p className={`title ${craftEnv.isDarkMode ? 'dark' : 'light'}`}>Preview</p>
+          <button className={`btn toc-preview-btn ${craftEnv.isDarkMode ? "dark" : ""}`} onClick={refreshTableOfContents}>
             Refresh
           </button>
         </div>
       }
       { 
         <div
-          className={`toc-container toc-container-indent-${indent} ${isDarkMode ? 'toc-container-dark' : 'toc-container-light'}`}
+          className={`toc-container toc-container-indent-${indent} ${craftEnv.isDarkMode ? 'toc-container-dark' : 'toc-container-light'}`}
         >
           { tocPreview }
         </div>
