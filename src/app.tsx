@@ -1,6 +1,7 @@
 import * as React from "react"
 import * as ReactDOM from 'react-dom'
 import {
+  DevicePlatform,
   CraftTextRun,
   CraftTextBlock,
   CraftTextBlockInsert,
@@ -15,14 +16,14 @@ declare const INSIGHTS_PROJECT_KEY: string | null; // from webpack
 declare const IS_DEV_MODE: boolean; // from webpack
 
 // Types
-import { TOCSettings } from "./types"
+import { CraftEnv, TOCSettings } from "./types"
 
 // Components
 import { TableOfContentsSettings } from "./TableOfContentsSettings";
 import { TableOfContentsPreview } from "./TableOfContentsPreview";
 
 const App: React.FC<{}> = () => {
-  const isDarkMode = useCraftDarkMode();
+  const craftEnv = useCraftEnv();
   
   // TOC loading and error states
   const [loading, setLoading] = React.useState(true);
@@ -88,12 +89,12 @@ const App: React.FC<{}> = () => {
   }, [tocSettings]);
 
   React.useEffect(() => {
-    if (isDarkMode) {
+    if (craftEnv.isDarkMode) {
       document.body.classList.add("dark");
     } else {
       document.body.classList.remove("dark");
     }
-  }, [isDarkMode]);
+  }, [craftEnv.isDarkMode]);
 
   const tocEmpty = (<p className="toc-empty">This document doesn't contain any title, subtitle or heading, so Table of Contents could not be generated.</p>)
 
@@ -126,15 +127,7 @@ const App: React.FC<{}> = () => {
     if (!IS_DEV_MODE) {
       track({
         id: "toc-inserted",
-        parameters: {
-          rootTocItemCount: tableOfContentsItems.length.toString(),
-          tocItemCount: getTOCItemCount(tableOfContentsItems).toString(),
-          tocDeepness: getTOCDeepness(tableOfContentsItems).toString(),
-          settingsIncludeSubblocks: tocSettings.includeSubblocks.toString(),
-          settingsAddDeeplinks: tocSettings.addDeeplinks.toString(),
-          settingsIncludeSubtitles: tocSettings.includeSubtitles.toString(),
-          settingsIncludeHeadings: tocSettings.includeHeadings.toString(),
-        }
+        parameters: getAnalyticsParamters()
       })
     }
   }
@@ -188,9 +181,41 @@ const App: React.FC<{}> = () => {
     return insertedTextBlocks;
   }
 
+  function logTocItemNavigationStarted() {
+    if (!IS_DEV_MODE) {
+      track({
+        id: "toc-navigation-started",
+        parameters: getAnalyticsParamters()
+      })
+    }
+  }
+
+  function logTocItemNavigationFailed() {
+    if (!IS_DEV_MODE) {
+      track({
+        id: "toc-navigation-failed",
+        parameters: getAnalyticsParamters()
+      })
+    }
+  }
+
+  function getAnalyticsParamters() {
+    return {
+      isDarkMode: craftEnv.isDarkMode ? 'dark' : 'light',
+      platform: craftEnv.platform,
+      rootTocItemCount: tableOfContentsItems.length.toString(),
+      tocItemCount: getTOCItemCount(tableOfContentsItems).toString(),
+      tocDeepness: getTOCDeepness(tableOfContentsItems).toString(),
+      settingsIncludeSubblocks: tocSettings.includeSubblocks.toString(),
+      settingsAddDeeplinks: tocSettings.addDeeplinks.toString(),
+      settingsIncludeSubtitles: tocSettings.includeSubtitles.toString(),
+      settingsIncludeHeadings: tocSettings.includeHeadings.toString(),
+    }
+  }
+
   return (
     <div id="app">
-      <header className={isDarkMode ? 'header-dark' : 'header-light'}>
+      <header className={craftEnv.isDarkMode ? 'header-dark' : 'header-light'}>
         <div></div>
         <div className="title">Table of Contents</div>
         <div></div>
@@ -198,15 +223,15 @@ const App: React.FC<{}> = () => {
       <main>
         { loading ? (
           <div className="loading-container">
-            <div className={`loading-spinner ${isDarkMode ? 'dark' : 'light'}`} />
+            <div className={`loading-spinner ${craftEnv.isDarkMode ? 'dark' : 'light'}`} />
             <label>Loading...</label>
           </div>
         ) : documentError ?
-          (<p className={`error-message ${isDarkMode ? 'dark' : 'light'}`}>Error happened in document download. Please try again</p>) :
+          (<p className={`error-message ${craftEnv.isDarkMode ? 'dark' : 'light'}`}>Error happened in document download. Please try again</p>) :
           (
             <>
               <TableOfContentsSettings
-                isDarkMode={isDarkMode}
+                isDarkMode={craftEnv.isDarkMode}
                 tocSettings={tocSettings}
                 onToggleIncludeSubblocks={onToggleIncludeSubblocks}
                 onToggleAddDeeplinks={onToggleAddDeeplinks}
@@ -218,15 +243,17 @@ const App: React.FC<{}> = () => {
                 tableOfContentsItems.length === 0 ?
                   tocEmpty :
                   <TableOfContentsPreview
-                    isDarkMode={isDarkMode}
+                    craftEnv={craftEnv}
                     tableOfContents={tableOfContentsItems}
                     indent={0}
                     refreshTableOfContents={reloadTOC}
+                    tocItemNavigationStarted={logTocItemNavigationStarted}
+                    tocItemNavigationFailed={logTocItemNavigationFailed}
                   />
               }
 
               { tableOfContentsItems.length > 0 &&
-                <button className={`btn toc-btn ${isDarkMode ? "dark" : ""}`} onClick={insertTableOfContents}>
+                <button className={`btn toc-btn ${craftEnv.isDarkMode ? "dark" : ""}`} onClick={insertTableOfContents}>
                   Add Table of Contents
                 </button>
               }
@@ -234,8 +261,8 @@ const App: React.FC<{}> = () => {
           )
         }
       </main>
-      <footer className={isDarkMode ? 'footer-dark' : 'footer-light'}>
-        <span>Created by <a className={isDarkMode ? 'authorlink-dark' : 'authorlink-light'} href="https://csabaszabo.dev/" target="_blank">csabaszabo</a></span>
+      <footer className={craftEnv.isDarkMode ? 'footer-dark' : 'footer-light'}>
+        <span>Created by <a className={craftEnv.isDarkMode ? 'authorlink-dark' : 'authorlink-light'} href="https://csabaszabo.dev/" target="_blank">csabaszabo</a></span>
       </footer>
     </div>
   )
@@ -243,14 +270,21 @@ const App: React.FC<{}> = () => {
   
 }
 
-function useCraftDarkMode() {
+function useCraftEnv(): CraftEnv {
   const [isDarkMode, setIsDarkMode] = React.useState(false);
+  const [platform, setPlatform] = React.useState<DevicePlatform>("Web");
 
   React.useEffect(() => {
-    craft.env.setListener(env => setIsDarkMode(env.colorScheme === "dark"));
+    craft.env.setListener(env => {
+      setIsDarkMode(env.colorScheme === "dark")
+      setPlatform(env.platform)
+    });
   }, []);
 
-  return isDarkMode;
+  return {
+    isDarkMode,
+    platform
+  };
 }
 
 function getTOCItemCount(items: CraftTextBlock[]): number {
