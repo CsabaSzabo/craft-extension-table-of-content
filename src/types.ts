@@ -1,3 +1,5 @@
+import { DevicePlatform } from '@craftdocs/craft-extension-api';
+
 export type TOCSettings = {
   // Subpages options
   showSubpages: boolean;
@@ -9,4 +11,9 @@ export type TOCSettings = {
   // Style options
   includeSubtitles: boolean;
   includeHeadings: boolean;
+}
+
+export type CraftEnv = {
+  isDarkMode: boolean;
+  platform: DevicePlatform;
 }

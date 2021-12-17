@@ -214,6 +214,7 @@ main {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  cursor: pointer;
 }
 
 .toc-h1 {
