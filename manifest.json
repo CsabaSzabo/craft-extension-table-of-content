@@ -5,6 +5,6 @@
   "author" : "Csaba Szabo",
   "author-email" : "csaba@evdb.io",
   "description" : "Creating Table of Contents of a document",
-  "api": "1.0.0",
+  "api": "0.0.4",
   "main": "index.html"
 }
