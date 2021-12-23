@@ -1,8 +1,13 @@
 import { DevicePlatform } from '@craftdocs/craft-extension-api';
 
 export type TOCSettings = {
-  includeSubblocks: boolean;
+  // Subpages options
+  showSubpages: boolean;
+  
+  // Deeplink options
   addDeeplinks: boolean;
+
+  // Style options
   includeSubtitles: boolean;
   includeHeadings: boolean;
 }
