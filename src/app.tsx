@@ -32,7 +32,6 @@ const App: React.FC<{}> = () => {
   // TOC content
   const [tocSettings, setTocSettings] = React.useState<TOCSettings>({
     showSubpages: true,
-    showOnlyStyledSubpages: false,
     addDeeplinks: true,
     includeSubtitles: true,
     includeHeadings: true,
@@ -188,7 +187,6 @@ const App: React.FC<{}> = () => {
       tocItemCount: getTOCItemCount(tableOfContentsItems).toString(),
       tocDeepness: getTOCDeepness(tableOfContentsItems).toString(),
       settingsShowSubpages: tocSettings.showSubpages.toString(),
-      settingsShowOnlyStyledSubpages: tocSettings.showOnlyStyledSubpages.toString(),      
       settingsAddDeeplinks: tocSettings.addDeeplinks.toString(),
       settingsIncludeSubtitles: tocSettings.includeSubtitles.toString(),
       settingsIncludeHeadings: tocSettings.includeHeadings.toString(),

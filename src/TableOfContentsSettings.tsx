@@ -30,7 +30,7 @@ export const TableOfContentsSettings: React.FC<TableOfContentsSettingsProps> = (
           </label>
         </div>
         {/* Subpage settings */}
-        <div className={`settingsItem ${tocSettings.showSubpages ? 'hasSubItems' : ''} ${isDarkMode ? 'dark' : ''}`}>
+        <div className={`settingsItem ${isDarkMode ? 'dark' : ''}`}>
           <label>
             <input
               name="showSubpages"
@@ -40,21 +40,6 @@ export const TableOfContentsSettings: React.FC<TableOfContentsSettingsProps> = (
             />
             <span>Show subpages</span>
           </label>
-
-          { 
-            tocSettings.showSubpages &&
-            <div className="settingsSubItem">
-              <label>
-                <input
-                  name="showOnlyStyledSubpages"
-                  type="checkbox"
-                  checked={tocSettings.showOnlyStyledSubpages}
-                  onChange={(e) => onToggleSettingsCheckbox(e, 'showOnlyStyledSubpages')}
-                />
-                <span>Only styled subpages</span>
-              </label>
-          </div>
-          }
         </div>
 
         {/* Styling settings */}

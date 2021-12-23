@@ -4,46 +4,29 @@ import { TOCSettings } from "./types"
 
 export async function getAllTextTitleBlocks(tocSettings: TOCSettings, isDevMode: boolean): Promise<CraftTextBlock> {
   const currentDocument = await getCurrentPage(isDevMode);
-  const filteredCurrentDocument = filterTextBlockForTableOfContent(currentDocument, tocSettings)
+  const filteredCurrentDocument = filterTextBlockForTableOfContent(currentDocument, tocSettings, 0);
   return filteredCurrentDocument;
 }
 
-function filterTextBlockForTableOfContent(block: CraftTextBlock, tocSettings: TOCSettings): CraftTextBlock {
+function filterTextBlockForTableOfContent(block: CraftTextBlock, tocSettings: TOCSettings, indent: number): CraftTextBlock {
   // deep copy block
   let filteredTextBlock = JSON.parse(JSON.stringify(block));
   filteredTextBlock.subblocks = [];
 
   const textSubBlocks = block.subblocks.filter(isTextBlock);
   textSubBlocks.forEach(textSubBlock => {
-    const containTitleSubblock = doesTextBlockContainTitleSubblock(textSubBlock, tocSettings)
-    if (tocSettings.showSubpages && tocSettings.showOnlyStyledSubpages && containTitleSubblock) {
-      // Add only styled textblock to TOC
-      console.log(`A - showSubpages=${tocSettings.showSubpages} - showOnlyStyledSubpages=${tocSettings.showOnlyStyledSubpages} - containTitleSubblock=${containTitleSubblock}`)
-      filteredTextBlock.subblocks.push(filterTextBlockForTableOfContent(textSubBlock, tocSettings));
-    } else if (tocSettings.showSubpages) {
-      // Add any textblock to TOC
-      console.log(`B - showSubpages=${tocSettings.showSubpages} - showOnlyStyledSubpages=${tocSettings.showOnlyStyledSubpages} - containTitleSubblock=${containTitleSubblock}`)
-      filteredTextBlock.subblocks.push(textSubBlock);
+
+    if (tocSettings.showSubpages && textSubBlock.subblocks.length > 0) {
+      // Add textBlock with subblocks (which are filtered)
+      filteredTextBlock.subblocks.push(filterTextBlockForTableOfContent(textSubBlock, tocSettings, indent + 1));
     } else if (isTitleTextBlock(textSubBlock, tocSettings)) {
-      // Othersiwe add only title textblock
-      if (tocSettings.showSubpages) {
-        filteredTextBlock.subblocks.push(textSubBlock);
-      } else {
-        const filteredTextSublockWithoutSubsubblocks = JSON.parse(JSON.stringify(textSubBlock));
-        filteredTextSublockWithoutSubsubblocks.subblocks = [];
-        filteredTextBlock.subblocks.push(filteredTextSublockWithoutSubsubblocks);
-      }
+      const filteredTextSublockWithoutSubsubblocks = JSON.parse(JSON.stringify(textSubBlock));
+      filteredTextSublockWithoutSubsubblocks.subblocks = [];
+      filteredTextBlock.subblocks.push(filteredTextSublockWithoutSubsubblocks);
     }
   })
 
   return filteredTextBlock;
-}
-
-// Returns true if the textblock is a title textblock (title, subtitle, heading) OR if it's subblock (or subblock or sublock recursively) contains a title textblock
-function doesTextBlockContainTitleSubblock(block: CraftTextBlock, tocSettings: TOCSettings): boolean {
-  return block.subblocks.filter(isTextBlock).some(textSubBlock => {
-    return isTitleTextBlock(textSubBlock, tocSettings) || doesTextBlockContainTitleSubblock(textSubBlock, tocSettings);
-  });
 }
 
 function isTextBlock(block: CraftBlock): block is CraftTextBlock {

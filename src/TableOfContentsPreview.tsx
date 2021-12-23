@@ -48,6 +48,8 @@ export const TableOfContentsPreview: React.FC<TableOfContentsPreviewProps> = (pr
         divClass += ' toc-h3';
       } else if (hasSubs) {
         divClass += ' toc-text toc-subs';
+      } else {
+        divClass += ' toc-text';
       }
       tocPreview.push(
         <div className={divClass} key={item.id} onClick={(e) => handleClick(item)}>
